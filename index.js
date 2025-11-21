@@ -1,5 +1,5 @@
 // expecting time to be a string in the format like '8:15' or '12:30'
-function hourint_to_hourstr(hourstr) {
+function hourint_to_hourstr(hourint) {
   //  0 -> midnight
   // 1 - 11 -> normally
   // 12 -> midday
@@ -18,29 +18,31 @@ function hourint_to_hourstr(hourstr) {
     11: "eleven",
     12: "midday",
   };
-  return hour_map[hourstr];
+  return hour_map[hourint];
 }
 
-function minutesint_to_minutesstr(minutesstr) {
+function minutesint_to_minutesstr(minutesint) {
   // 1 to 29
-  // 30 -> half
+  // 30 -> half past
+  // 15 -> quarter past
+  // 45 -> quarter to
   // x = 31 - 59 -> 60-x . e.g: 2:31 -> twenty nine to three
   const timeToWords = {
-    "01": "one",
-    "02": "two",
-    "03": "three",
-    "04": "four",
-    "05": "five",
-    "06": "six",
-    "07": "seven",
-    "08": "eight",
-    "09": "nine",
+    1: "one",
+    2: "two",
+    3: "three",
+    4: "four",
+    5: "five",
+    6: "six",
+    7: "seven",
+    8: "eight",
+    9: "nine",
     10: "ten",
     11: "eleven",
     12: "twelve",
     13: "thirteen",
     14: "fourteen",
-    15: "fifteen",
+    15: "quarter",
     16: "sixteen",
     17: "seventeen",
     18: "eighteen",
@@ -57,35 +59,48 @@ function minutesint_to_minutesstr(minutesstr) {
     29: "twenty-nine",
   };
 
-  if (Number(minutesstr) > 30) {
-    minutesstr = String(60 - Number(minutesstr));
+  if (minutesint === 30) {
+    return "half";
   }
 
-  if (minutesstr == "30") {
-    return "thirty";
-  } else {
-    return timeToWords[minutesstr];
+  if (minutesint > 30) {
+    minutesint = 60 - minutesint;
   }
+
+  return timeToWords[minutesint];
 }
 
 function convertTimeToWords(time) {
-  // TODO: real code goes here!
   // separate the hour and minutes
-  const hourint = time.split(":")[0];
-  const minutesint = time.split(":")[1];
+  const hourint = parseInt(time.split(":")[0]);
+  const minutesint = parseInt(time.split(":")[1]);
 
   // all special cases should be put above
   if (time === "0:00") {
     return "midnight";
   }
 
+  if (time === "12:00") {
+    return "midday";
+  }
+
+  // handle o'clock case (minutes = 0)
+  if (minutesint === 0) {
+    const hourstr = hourint_to_hourstr(hourint);
+    return `${hourstr} o'clock`;
+  }
+
   // the common format here
   let hourstr = hourint_to_hourstr(hourint);
-  const minutesstr = minutesint_to_minutesstr(minutesint);
-  if (Number(minutesint) > 30) {
+  let minutesstr = minutesint_to_minutesstr(minutesint);
+
+  if (minutesint > 30) {
     // the 'to' case
-    hourstr = String(Number(hourstr) + 1);
-    return `${minutesstr} to ${hourstr}`;
+    const nexthourint = (hourint + 1) % 24;
+    const nexthourstr = hourint_to_hourstr(nexthourint);
+    return `${minutesstr} to ${nexthourstr}`;
+  } else if (minutesint === 30) {
+    return `${minutesstr} past ${hourstr}`;
   } else {
     return `${minutesstr} past ${hourstr}`;
   }
