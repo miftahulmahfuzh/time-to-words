@@ -57,11 +57,8 @@ function minutesint_to_minutesstr(minutesint) {
     27: "twenty-seven",
     28: "twenty-eight",
     29: "twenty-nine",
+    30: "half",
   };
-
-  if (minutesint === 30) {
-    return "half";
-  }
 
   if (minutesint > 30) {
     minutesint = 60 - minutesint;
@@ -99,8 +96,6 @@ function convertTimeToWords(time) {
     const nexthourint = (hourint + 1) % 24;
     const nexthourstr = hourint_to_hourstr(nexthourint);
     return `${minutesstr} to ${nexthourstr}`;
-  } else if (minutesint === 30) {
-    return `${minutesstr} past ${hourstr}`;
   } else {
     return `${minutesstr} past ${hourstr}`;
   }
@@ -116,4 +111,10 @@ console.log(output);
 output = convertTimeToWords("2:33");
 console.log(output);
 output = convertTimeToWords("2:10");
+console.log(output);
+output = convertTimeToWords("2:30");
+console.log(output);
+output = convertTimeToWords("2:15");
+console.log(output);
+output = convertTimeToWords("2:45");
 console.log(output);
